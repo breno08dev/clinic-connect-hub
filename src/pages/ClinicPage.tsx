@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { CalendarIcon, Clock, CheckCircle2, User, Phone, Sparkles, MapPin, CalendarDays, Loader2, CalendarX2, MessageCircle, Lock } from "lucide-react";
 // ADICIONADO: isBefore para verificar a data
 import { format, parseISO, startOfToday, isBefore } from "date-fns";
+import logoConectNew from "@/assets/logo.png";
 
 interface Clinic {
   id: string;
@@ -527,8 +528,24 @@ export default function ClinicPage() {
             </p>
           </div>
 
+
+          <footer className="mt-12 pb-8 text-center flex flex-col items-center justify-center gap-2 border-t pt-8">
+  <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
+    Agendamento seguro via
+  </p>
+  <a 
+    href="https://conectnew.com.br" 
+    target="_blank" 
+    rel="noopener noreferrer" 
+    className="transition-all duration-300 hover:scale-105 opacity-60 hover:opacity-100"
+  >
+    <img src={logoConectNew} alt="ConectNew" className="h-7 w-auto object-contain" />
+  </a>
+</footer>
         </form>
       </div>
     </div>
+
+    
   );
 }

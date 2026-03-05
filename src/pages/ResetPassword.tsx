@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, Lock, CheckCircle2 } from "lucide-react";
 
-import logoConectNew from "@/assets/logo-conectnew.png";
+import logoConectNew from "@/assets/logo.png";
 
 export default function ResetPassword() {
   const navigate = useNavigate();

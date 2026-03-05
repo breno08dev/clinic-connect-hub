@@ -85,11 +85,13 @@ export default function DashboardLayout() {
     navigate("/login");
   };
 
-  const copyLink = () => {
-    const link = `${window.location.origin}/c/${clinic?.slug}`;
-    navigator.clipboard.writeText(link);
-    toast.success("Link copiado para a área de transferência!");
-  };
+ const copyLink = () => {
+  if (!clinic?.slug) return;
+  //window.location.origin pegará automaticamente 'https://conectnew.com.br' em produção
+  const link = `${window.location.origin}/${clinic.slug}`;
+  navigator.clipboard.writeText(link);
+  toast.success("Link da sua página copiado!");
+};
 
   const isTrialExpired = clinic?.plan_type !== 'premium' && clinic?.trial_ends_at && isBefore(parseISO(clinic.trial_ends_at), new Date());
   const stripePaymentLink = `https://buy.stripe.com/test_cNi5kF7c70OXeNZ6Ts5c400?client_reference_id=${clinic?.id}`;

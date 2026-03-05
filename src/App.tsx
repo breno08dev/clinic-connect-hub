@@ -29,11 +29,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Páginas Institucionais e Autenticação */}
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/c/:slug" element={<ClinicPage />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
-          {/* Rotas Agrupadas do Dashboard com o Sidebar Layout */}
+          {/* Rotas Agrupadas do Dashboard */}
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="services" element={<ServicesPage />} />
@@ -43,9 +44,13 @@ const App = () => (
             <Route path="hours" element={<HoursPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
 
+          {/* 🚀 URL Profissional: conectnew.com.br/nome-da-empresa */}
+          {/* Esta rota dinâmica deve vir por último antes do 404 */}
+          <Route path="/:slug" element={<ClinicPage />} />
+
+          {/* Fallback 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
