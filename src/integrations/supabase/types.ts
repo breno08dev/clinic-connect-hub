@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
@@ -25,6 +23,10 @@ export type Database = {
           service: string
           status: string
           time: string | null
+          price: number | null
+          payment_method: string | null
+          professional_id: string | null
+          professional_name: string | null
         }
         Insert: {
           clinic_id: string
@@ -36,6 +38,10 @@ export type Database = {
           service: string
           status?: string
           time?: string | null
+          price?: number | null
+          payment_method?: string | null
+          professional_id?: string | null
+          professional_name?: string | null
         }
         Update: {
           clinic_id?: string
@@ -47,6 +53,10 @@ export type Database = {
           service?: string
           status?: string
           time?: string | null
+          price?: number | null
+          payment_method?: string | null
+          professional_id?: string | null
+          professional_name?: string | null
         }
         Relationships: [
           {
@@ -56,6 +66,13 @@ export type Database = {
             referencedRelation: "clinics"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "appointments_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          }
         ]
       }
       clinics: {
@@ -70,6 +87,9 @@ export type Database = {
           slug: string
           user_id: string
           whatsapp: string | null
+          plan_type: string
+          trial_ends_at: string
+          stripe_customer_id: string | null
         }
         Insert: {
           created_at?: string
@@ -82,6 +102,9 @@ export type Database = {
           slug: string
           user_id: string
           whatsapp?: string | null
+          plan_type?: string
+          trial_ends_at?: string
+          stripe_customer_id?: string | null
         }
         Update: {
           created_at?: string
@@ -94,8 +117,120 @@ export type Database = {
           slug?: string
           user_id?: string
           whatsapp?: string | null
+          plan_type?: string
+          trial_ends_at?: string
+          stripe_customer_id?: string | null
         }
         Relationships: []
+      }
+      professionals: {
+        Row: {
+          id: string
+          clinic_id: string
+          name: string
+          phone: string | null
+          commission: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          clinic_id: string
+          name: string
+          phone?: string | null
+          commission?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          clinic_id?: string
+          name?: string
+          phone?: string | null
+          commission?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professionals_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      services: {
+        Row: {
+          id: string
+          clinic_id: string
+          name: string
+          description: string | null
+          price: number | null
+          duration_minutes: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          clinic_id: string
+          name: string
+          description?: string | null
+          price?: number | null
+          duration_minutes?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          clinic_id?: string
+          name?: string
+          description?: string | null
+          price?: number | null
+          duration_minutes?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      working_hours: {
+        Row: {
+          id: string
+          clinic_id: string
+          day_of_week: number
+          is_open: boolean
+          start_time: string
+          end_time: string
+          professional_id: string | null
+        }
+        Insert: {
+          id?: string
+          clinic_id: string
+          day_of_week: number
+          is_open?: boolean
+          start_time?: string
+          end_time?: string
+        }
+        Update: {
+          id?: string
+          clinic_id?: string
+          day_of_week?: number
+          is_open?: boolean
+          start_time?: string
+          end_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "working_hours_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
