@@ -6,16 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Palette, Upload, Image as ImageIcon, X } from "lucide-react";
+import { Loader2, Palette, Upload, Image as ImageIcon, X, Building2, Globe, Save, Info } from "lucide-react";
 
 export default function SettingsPage() {
   const { clinic } = useDashboardContext();
   
-  const [editName, setEditName] = useState(clinic.name);
+  // Campos editáveis
   const [editPhone, setEditPhone] = useState(clinic.phone || "");
   const [editWhatsapp, setEditWhatsapp] = useState(clinic.whatsapp || "");
   const [editDescription, setEditDescription] = useState(clinic.description || "");
-  
   const [editLogoUrl, setEditLogoUrl] = useState(clinic.logo_url || "");
   const [editColor, setEditColor] = useState(clinic.primary_color || "#0ea5e9");
   
@@ -24,6 +23,7 @@ export default function SettingsPage() {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Função de Upload de Logo para o Storage do Supabase
   const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploadingLogo(true);
@@ -49,9 +49,7 @@ export default function SettingsPage() {
         .from('logos')
         .upload(filePath, file);
 
-      if (uploadError) {
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
         .from('logos')
@@ -72,137 +70,188 @@ export default function SettingsPage() {
     setEditLogoUrl("");
   };
 
+  // Salvar as alterações no Banco de Dados
   const handleSaveClinic = async () => {
     setSaving(true);
-    const { error } = await supabase
-      .from("clinics")
-      .update({
-        name: editName,
-        phone: editPhone || null,
-        whatsapp: editWhatsapp || null,
-        description: editDescription || null,
-        logo_url: editLogoUrl || null,
-        primary_color: editColor,
-      })
-      .eq("id", clinic.id);
+    try {
+      const { error } = await supabase
+        .from("clinics")
+        .update({
+          // Note que não enviamos 'name' nem 'slug' aqui para garantir que não mudem
+          phone: editPhone || null,
+          whatsapp: editWhatsapp || null,
+          description: editDescription || null,
+          logo_url: editLogoUrl || null,
+          primary_color: editColor,
+        })
+        .eq("id", clinic.id);
 
-    setSaving(false);
-    if (error) {
-      toast.error("Erro ao guardar definições: " + error.message);
-    } else {
+      if (error) throw error;
       toast.success("Definições do negócio atualizadas com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro ao guardar definições: " + error.message);
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="container max-w-6xl py-8 space-y-8 animate-in fade-in duration-500">
       <div>
-        <h2 className="text-2xl font-heading font-bold tracking-tight">Ajustes do Negócio</h2>
-        <p className="text-muted-foreground">Personalize a sua página pública de agendamentos.</p>
+        <h2 className="text-3xl font-bold tracking-tight">Ajustes do Negócio</h2>
+        <p className="text-muted-foreground">Personalize a sua identidade visual e informações de contacto.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle>Dados Principais</CardTitle>
-            <CardDescription>Informações de contacto visíveis para o cliente.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Nome do Negócio</Label>
-              <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+        
+        {/* COLUNA 1: DADOS DO NEGÓCIO */}
+        <div className="space-y-6">
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-primary" />
+                <CardTitle>Identidade Fixa</CardTitle>
+              </div>
+              <CardDescription>Estes dados não podem ser alterados após o registro.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Telefone (Fixo)</Label>
-                <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="(00) 0000-0000" />
+                <Label className="text-foreground/70">Nome do Negócio</Label>
+                <Input value={clinic.name} disabled className="bg-muted/50 cursor-not-allowed font-medium" />
               </div>
               <div className="space-y-2">
-                <Label>WhatsApp (Contacto)</Label>
-                <Input value={editWhatsapp} onChange={(e) => setEditWhatsapp(e.target.value)} placeholder="5511999999999" />
+                <Label className="text-foreground/70">Sua URL Exclusiva</Label>
+                <div className="flex items-center">
+                  <div className="flex items-center px-3 h-10 border border-r-0 rounded-l-md bg-muted text-muted-foreground text-sm font-medium">
+                    conectnew.com.br/
+                  </div>
+                  <Input value={clinic.slug} disabled className="rounded-l-none bg-muted/50 cursor-not-allowed font-medium" />
+                </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Descrição Curta / Especialidades</Label>
-              <Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} placeholder="Ex: Barbearia especializada em cortes modernos..." />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle>Identidade Visual</CardTitle>
-            <CardDescription>Deixe a página com a cara da sua marca.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            
-            <div className="space-y-3">
-              <Label className="flex items-center gap-2">Logotipo da Empresa</Label>
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader>
+              <CardTitle>Contacto e Bio</CardTitle>
+              <CardDescription>Informações visíveis na sua página de agendamento.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Telefone (Fixo)</Label>
+                  <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="(00) 0000-0000" />
+                </div>
+                <div className="space-y-2">
+                  <Label>WhatsApp (Link Direto)</Label>
+                  <Input value={editWhatsapp} onChange={(e) => setEditWhatsapp(e.target.value)} placeholder="5516988392871" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Descrição / Especialidades</Label>
+                <Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} placeholder="Ex: Barbearia especializada em cortes modernos..." />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* COLUNA 2: IDENTIDADE VISUAL */}
+        <div className="space-y-6">
+          <Card className="border-border/50 shadow-sm overflow-hidden">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Palette className="h-5 w-5 text-primary" />
+                <CardTitle>Identidade Visual</CardTitle>
+              </div>
+              <CardDescription>Personalize as cores e o logotipo da sua página.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               
-              <div className="flex items-center gap-4">
-                <div className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/50 overflow-hidden">
-                  {editLogoUrl ? (
-                    <>
-                      <img src={editLogoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
-                      <Button 
-                        variant="destructive" 
-                        size="icon" 
-                        className="absolute -right-2 -top-2 h-6 w-6 rounded-full scale-75"
-                        onClick={handleRemoveLogo}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </>
-                  ) : (
-                    <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
-                  )}
-                </div>
-
-                <div className="flex-1 space-y-2">
-                  <input 
-                    type="file" 
-                    accept="image/png, image/jpeg, image/jpg, image/svg+xml, image/webp" 
-                    className="hidden" 
-                    ref={fileInputRef}
-                    onChange={handleLogoUpload}
-                  />
-                  <Button 
-                    variant="outline" 
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingLogo}
-                    className="w-full sm:w-auto"
-                  >
-                    {uploadingLogo ? (
-                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> A carregar...</>
+              <div className="space-y-4">
+                <Label>Logotipo da Empresa</Label>
+                <div className="flex items-center gap-6">
+                  <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30 overflow-hidden group">
+                    {editLogoUrl ? (
+                      <>
+                        <img src={editLogoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
+                        <button 
+                          onClick={handleRemoveLogo}
+                          className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-6 w-6 text-white" />
+                        </button>
+                      </>
                     ) : (
-                      <><Upload className="mr-2 h-4 w-4" /> Escolher Imagem</>
+                      <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
                     )}
-                  </Button>
-                  <p className="text-xs text-muted-foreground">Tamanho máximo recomendado: 2MB. Formatos: PNG, JPG ou SVG.</p>
+                  </div>
+
+                  <div className="flex-1 space-y-3">
+                    <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleLogoUpload} />
+                    <Button 
+                      variant="outline" 
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="w-full"
+                    >
+                      {uploadingLogo ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                      Alterar Logo
+                    </Button>
+                    <p className="text-[11px] text-muted-foreground leading-tight">
+                      PNG, JPG ou SVG. Máximo 2MB. Use imagens com fundo transparente para melhor resultado.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="space-y-2 pt-2 border-t border-border">
-              <Label className="flex items-center gap-2"><Palette className="h-4 w-4"/> Cor Principal</Label>
-              <div className="flex items-center gap-4">
-                <Input type="color" className="h-12 w-24 p-1 cursor-pointer" value={editColor} onChange={(e) => setEditColor(e.target.value)} />
-                <div className="text-sm font-medium">{editColor.toUpperCase()}</div>
+
+              <div className="space-y-3 pt-4 border-t">
+                <Label className="flex items-center gap-2">Cor de Destaque</Label>
+                <div className="flex items-center gap-4">
+                  <div 
+                    className="h-12 w-12 rounded-lg border shadow-sm shrink-0" 
+                    style={{ backgroundColor: editColor }}
+                  />
+                  <Input 
+                    type="color" 
+                    className="h-10 w-full cursor-pointer p-1" 
+                    value={editColor} 
+                    onChange={(e) => setEditColor(e.target.value)} 
+                  />
+                  <div className="text-sm font-mono font-bold w-20">{editColor.toUpperCase()}</div>
+                </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            <div className="rounded-lg bg-muted p-4 text-sm border border-border mt-6">
-              <div className="mb-2 font-medium text-foreground">O Seu Link de Agendamento Público:</div>
-              <a href={`${window.location.origin}/c/${clinic.slug}`} target="_blank" rel="noreferrer" className="text-primary hover:underline break-all font-semibold">
-                {window.location.origin}/c/{clinic.slug}
-              </a>
-            </div>
+          {/* BOX DO LINK PÚBLICO */}
+          <Card className="bg-primary/5 border-primary/20 shadow-none">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <Globe className="h-5 w-5 text-primary mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-primary uppercase tracking-wider">Sua página está ativa em:</p>
+                  <a 
+                    href={`${window.location.origin}/${clinic.slug}`} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="text-base text-slate-900 hover:underline break-all font-semibold flex items-center gap-1"
+                  >
+                    conectnew.com.br/{clinic.slug}
+                  </a>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Button onClick={handleSaveClinic} className="w-full gradient-primary" disabled={saving}>
-              {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> A guardar...</> : "Guardar Alterações"}
-            </Button>
-          </CardContent>
-        </Card>
+          <Button 
+            onClick={handleSaveClinic} 
+            className="w-full h-14 text-lg font-bold shadow-xl transition-all hover:scale-[1.01] bg-gradient-to-r from-purple-600 to-sky-500 border-0" 
+            disabled={saving}
+          >
+            {saving ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> A guardar...</> : <><Save className="mr-2 h-5 w-5" /> Guardar Alterações</>}
+          </Button>
+        </div>
+
       </div>
     </div>
   );

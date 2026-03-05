@@ -59,7 +59,7 @@ export default function ResetPassword() {
       <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
         
         <div className="flex justify-center mb-8">
-          <img src={logoConectNew} alt="ConectNew" className="h-12 w-auto object-contain" />
+          <img src={logoConectNew} alt="ConectNew" className="h-28 w-auto object-contain" />
         </div>
 
         <div className="bg-card p-8 rounded-[2rem] shadow-2xl border border-border/50">

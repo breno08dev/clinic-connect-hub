@@ -539,7 +539,7 @@ export default function ClinicPage() {
     rel="noopener noreferrer" 
     className="transition-all duration-300 hover:scale-105 opacity-60 hover:opacity-100"
   >
-    <img src={logoConectNew} alt="ConectNew" className="h-7 w-auto object-contain" />
+    <img src={logoConectNew} alt="ConectNew" className="h-28 w-auto object-contain" />
   </a>
 </footer>
         </form>

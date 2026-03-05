@@ -60,7 +60,8 @@ export default function Login() {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin, 
+        // 🔥 AJUSTE REALIZADO: Agora redireciona explicitamente para a página de reset
+        redirectTo: `${window.location.origin}/reset-password`, 
       });
       if (error) throw error;
       toast.success("Email de recuperação enviado! Verifique a sua caixa de entrada.");
@@ -158,7 +159,7 @@ export default function Login() {
                 
                 {isSignUp && (
                   <div className="space-y-2.5 animate-in fade-in zoom-in-95 duration-300">
-                    <Label htmlFor="name">Como gosta de ser chamado?</Label>
+                    <Label htmlFor="name">Qual nome da sua Empresa?</Label>
                     <div className="relative">
                       <User className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/70" />
                       <Input id="name" type="text" placeholder="Nome Completo" className="pl-11 h-12 bg-background border-border/70" value={name} onChange={e => setName(e.target.value)} required />

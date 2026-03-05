@@ -32,6 +32,8 @@ const App = () => (
           {/* Páginas Institucionais e Autenticação */}
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginPage />} />
+          
+          {/* 🚀 Rota de Recuperação de Senha (Nível Superior para receber o link do email) */}
           <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Rotas Agrupadas do Dashboard */}
@@ -47,10 +49,10 @@ const App = () => (
           </Route>
 
           {/* 🚀 URL Profissional: conectnew.com.br/nome-da-empresa */}
-          {/* Esta rota dinâmica deve vir por último antes do 404 */}
+          {/* Esta rota dinâmica deve vir por último antes do 404 para não capturar rotas fixas */}
           <Route path="/:slug" element={<ClinicPage />} />
 
-          {/* Fallback 404 */}
+          {/* Fallback 404 para caminhos não encontrados */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

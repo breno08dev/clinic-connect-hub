@@ -94,7 +94,7 @@ export default function DashboardLayout() {
 };
 
   const isTrialExpired = clinic?.plan_type !== 'premium' && clinic?.trial_ends_at && isBefore(parseISO(clinic.trial_ends_at), new Date());
-  const stripePaymentLink = `https://buy.stripe.com/test_cNi5kF7c70OXeNZ6Ts5c400?client_reference_id=${clinic?.id}`;
+  const stripePaymentLink = `https://buy.stripe.com/5kQ5kx0bUctk1Sfb3adIA00?client_reference_id=${clinic?.id}`;
 
   const navItems = [
     { name: "Agendamentos", path: "/dashboard", icon: Calendar },
@@ -130,7 +130,7 @@ export default function DashboardLayout() {
     <img 
       src={logoConectNew} 
       alt="ConectNew" 
-      className="h-10 w-auto object-contain hover:scale-105 transition-transform" 
+      className="h-20 w-auto object-contain hover:scale-105 transition-transform" 
     />
   </Link>
   <Button variant="ghost" size="icon" className="md:hidden absolute right-4" onClick={() => setIsMobileMenuOpen(false)}>
