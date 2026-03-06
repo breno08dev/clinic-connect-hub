@@ -77,7 +77,6 @@ export default function SettingsPage() {
       const { error } = await supabase
         .from("clinics")
         .update({
-          // Note que não enviamos 'name' nem 'slug' aqui para garantir que não mudem
           phone: editPhone || null,
           whatsapp: editWhatsapp || null,
           description: editDescription || null,
@@ -121,11 +120,15 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label className="text-foreground/70">Sua URL Exclusiva</Label>
-                <div className="flex items-center">
-                  <div className="flex items-center px-3 h-10 border border-r-0 rounded-l-md bg-muted text-muted-foreground text-sm font-medium">
+                <div className="flex items-center overflow-hidden rounded-md border bg-muted focus-within:ring-1 focus-within:ring-ring">
+                  <div className="flex items-center px-2 sm:px-3 h-10 text-muted-foreground text-xs sm:text-sm font-medium whitespace-nowrap">
                     conectnew.com.br/
                   </div>
-                  <Input value={clinic.slug} disabled className="rounded-l-none bg-muted/50 cursor-not-allowed font-medium" />
+                  <Input 
+                    value={clinic.slug} 
+                    disabled 
+                    className="border-0 rounded-none bg-muted/50 cursor-not-allowed font-medium w-full focus-visible:ring-0" 
+                  />
                 </div>
               </div>
             </CardContent>
@@ -169,7 +172,7 @@ export default function SettingsPage() {
               
               <div className="space-y-4">
                 <Label>Logotipo da Empresa</Label>
-                <div className="flex items-center gap-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                   <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30 overflow-hidden group">
                     {editLogoUrl ? (
                       <>
@@ -186,19 +189,19 @@ export default function SettingsPage() {
                     )}
                   </div>
 
-                  <div className="flex-1 space-y-3">
+                  <div className="flex-1 space-y-3 w-full">
                     <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleLogoUpload} />
                     <Button 
                       variant="outline" 
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploadingLogo}
-                      className="w-full"
+                      className="w-full sm:w-auto"
                     >
                       {uploadingLogo ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                       Alterar Logo
                     </Button>
                     <p className="text-[11px] text-muted-foreground leading-tight">
-                      PNG, JPG ou SVG. Máximo 2MB. Use imagens com fundo transparente para melhor resultado.
+                      PNG, JPG ou SVG. Máximo 2MB. Use imagens com fundo transparente.
                     </p>
                   </div>
                 </div>

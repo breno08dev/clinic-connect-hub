@@ -85,13 +85,12 @@ export default function DashboardLayout() {
     navigate("/login");
   };
 
- const copyLink = () => {
-  if (!clinic?.slug) return;
-  //window.location.origin pegará automaticamente 'https://conectnew.com.br' em produção
-  const link = `${window.location.origin}/${clinic.slug}`;
-  navigator.clipboard.writeText(link);
-  toast.success("Link da sua página copiado!");
-};
+  const copyLink = () => {
+    if (!clinic?.slug) return;
+    const link = `${window.location.origin}/${clinic.slug}`;
+    navigator.clipboard.writeText(link);
+    toast.success("Link da sua página copiado!");
+  };
 
   const isTrialExpired = clinic?.plan_type !== 'premium' && clinic?.trial_ends_at && isBefore(parseISO(clinic.trial_ends_at), new Date());
   const stripePaymentLink = `https://buy.stripe.com/5kQ5kx0bUctk1Sfb3adIA00?client_reference_id=${clinic?.id}`;
@@ -117,7 +116,6 @@ export default function DashboardLayout() {
 
   return (
     <DashboardContext.Provider value={{ clinic }}>
-      {/* O SEGREDO ESTÁ AQUI: h-screen e overflow-hidden travam a tela inteira */}
       <div className="flex h-screen w-full bg-muted/10 overflow-hidden font-sans">
         
         {/* ========================================== */}
@@ -126,19 +124,19 @@ export default function DashboardLayout() {
         <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r flex flex-col transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}`}>
           
           <div className="h-20 flex items-center justify-center px-6 border-b shrink-0">
-  <Link to="/dashboard">
-    <img 
-      src={logoConectNew} 
-      alt="ConectNew" 
-      className="h-20 w-auto object-contain hover:scale-105 transition-transform" 
-    />
-  </Link>
-  <Button variant="ghost" size="icon" className="md:hidden absolute right-4" onClick={() => setIsMobileMenuOpen(false)}>
-    <X className="h-5 w-5" />
-  </Button>
-</div>
+            <Link to="/dashboard">
+              <img 
+                src={logoConectNew} 
+                alt="ConectNew" 
+                className="h-20 w-auto object-contain hover:scale-105 transition-transform" 
+              />
+            </Link>
+            <Button variant="ghost" size="icon" className="md:hidden absolute right-4" onClick={() => setIsMobileMenuOpen(false)}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
 
-          {/* Links de Navegação (Área que rola se houver muitos menus) */}
+          {/* Links de Navegação */}
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -154,9 +152,8 @@ export default function DashboardLayout() {
             })}
           </nav>
 
-          {/* Rodapé do Menu (Sempre grudado em baixo) */}
+          {/* Rodapé do Menu */}
           <div className="p-4 border-t shrink-0 bg-card/50">
-            {/* Aviso de Trial */}
             {clinic?.plan_type !== 'premium' && (
               <div className={`mb-4 p-4 rounded-xl border ${isTrialExpired ? 'bg-destructive/10 border-destructive/20 text-destructive' : 'bg-primary/5 border-primary/20'}`}>
                 <div className="flex items-center gap-2 mb-2">
@@ -181,25 +178,21 @@ export default function DashboardLayout() {
               </div>
             )}
 
-            {/* Botão Sair */}
             <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" /> Sair da conta
             </Button>
           </div>
         </aside>
 
-
         {/* ========================================== */}
         {/* ÁREA PRINCIPAL (CABEÇALHO + CONTEÚDO) */}
         {/* ========================================== */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
           
-          {/* Overlay Escuro para Mobile */}
           {isMobileMenuOpen && (
             <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
           )}
 
-          {/* Cabeçalho Superior Fixo */}
           <header className="h-16 flex-shrink-0 border-b bg-card flex items-center justify-between px-4 sm:px-6 z-10">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMobileMenuOpen(true)}>
@@ -211,22 +204,20 @@ export default function DashboardLayout() {
               </div>
             </div>
 
-            {/* Botões do Topo com o Bloqueio Aplicado */}
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" onClick={copyLink} className="hidden sm:flex" disabled={isTrialExpired}>
                 <Copy className="mr-1.5 h-3.5 w-3.5" /> Copiar Link
               </Button>
               
-              <Button variant="ghost" size="sm" onClick={() => window.open(`/c/${clinic?.slug}`, '_blank')} disabled={isTrialExpired}>
+              {/* O LINK FOI CORRIGIDO AQUI PARA REMOVER O '/c/' */}
+              <Button variant="ghost" size="sm" onClick={() => window.open(`/${clinic?.slug}`, '_blank')} disabled={isTrialExpired}>
                 <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> Ver Página
               </Button>
             </div>
           </header>
 
-          {/* Área de Scroll Interno (Onde as páginas carregam) */}
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
             
-            {/* TELA DE BLOQUEIO (Sobrepõe o conteúdo se estiver expirado) */}
             {isTrialExpired && (
               <div className="absolute inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center p-4">
                 <div className="max-w-md w-full bg-card p-8 rounded-2xl shadow-2xl border border-destructive/20 text-center animate-in zoom-in duration-300">
@@ -249,7 +240,6 @@ export default function DashboardLayout() {
               </div>
             )}
 
-            {/* Carrega as páginas internas aqui */}
             <Outlet />
             
           </main>

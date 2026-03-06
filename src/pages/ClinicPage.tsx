@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { CalendarIcon, Clock, CheckCircle2, User, Phone, Sparkles, MapPin, CalendarDays, Loader2, CalendarX2, MessageCircle, Lock } from "lucide-react";
-// ADICIONADO: isBefore para verificar a data
 import { format, parseISO, startOfToday, isBefore } from "date-fns";
 import logoConectNew from "@/assets/logo.png";
 
@@ -20,8 +19,8 @@ interface Clinic {
   primary_color: string;
   phone: string | null;
   whatsapp: string | null;
-  plan_type: string; // <-- Adicionado
-  trial_ends_at: string; // <-- Adicionado
+  plan_type: string;
+  trial_ends_at: string;
 }
 
 interface Service {
@@ -113,6 +112,11 @@ export default function ClinicPage() {
         const { data: bookedData } = await apptsQuery;
         const bookedTimes = bookedData?.map(a => a.time) || [];
 
+        const now = new Date();
+        const todayStr = format(now, "yyyy-MM-dd");
+        const isToday = selectedDate === todayStr;
+        const currentTotalMin = now.getHours() * 60 + now.getMinutes();
+
         const slots: string[] = [];
         const [startH, startM] = hoursData.start_time.split(':').map(Number);
         const [endH, endM] = hoursData.end_time.split(':').map(Number);
@@ -126,7 +130,9 @@ export default function ClinicPage() {
           const timeStr = `${h}:${m}`;
 
           if (!bookedTimes.includes(timeStr)) {
-            slots.push(timeStr);
+            if (!isToday || currentMin > currentTotalMin) {
+              slots.push(timeStr);
+            }
           }
           currentMin += 30;
         }
@@ -224,9 +230,6 @@ export default function ClinicPage() {
     </div>
   );
 
-  // ==========================================
-  // NOVA LÓGICA DE BLOQUEIO DA PÁGINA PÚBLICA
-  // ==========================================
   const isExpired = clinic.plan_type !== 'premium' && clinic.trial_ends_at && isBefore(parseISO(clinic.trial_ends_at), new Date());
 
   if (isExpired) {
@@ -528,24 +531,21 @@ export default function ClinicPage() {
             </p>
           </div>
 
-
           <footer className="mt-12 pb-8 text-center flex flex-col items-center justify-center gap-2 border-t pt-8">
-  <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
-    Agendamento seguro via
-  </p>
-  <a 
-    href="https://conectnew.com.br" 
-    target="_blank" 
-    rel="noopener noreferrer" 
-    className="transition-all duration-300 hover:scale-105 opacity-60 hover:opacity-100"
-  >
-    <img src={logoConectNew} alt="ConectNew" className="h-28 w-auto object-contain" />
-  </a>
-</footer>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
+              Agendamento seguro via
+            </p>
+            <a 
+              href="https://conectnew.com.br" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="transition-all duration-300 hover:scale-105 opacity-60 hover:opacity-100"
+            >
+              <img src={logoConectNew} alt="ConectNew" className="h-28 w-auto object-contain" />
+            </a>
+          </footer>
         </form>
       </div>
     </div>
-
-    
   );
 }
